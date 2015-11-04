@@ -1,4 +1,5 @@
 class Article < ActiveRecord::Base
+  include InvalidatesCache
   validates :title, :presence => true, :uniqueness => true
   validates :body, :presence => true
 
@@ -28,7 +29,11 @@ class Article < ActiveRecord::Base
   end
 
   def self.most_popular
-    all.sort_by{|a| a.comments.count }.last
+    id = Rails.cache.fetch("article_most_popular") do
+      all.sort_by{|a| a.comments.count }.last.id
+    end
+
+    find(id)
   end
 
   def self.random
@@ -49,7 +54,7 @@ class Article < ActiveRecord::Base
   end
 
   def self.for_dashboard
-    order('created_at DESC').limit(5)
+    @for_dashboard ||= order('created_at DESC').limit(5)
   end
 
   def word_count
@@ -57,7 +62,9 @@ class Article < ActiveRecord::Base
   end
 
   def self.total_word_count
-    all.inject(0) {|total, a| total += a.word_count }
+    Rails.cache.fetch("article_total_word_count") do
+      all.inject(0) {|total, a| total += a.word_count }
+    end
   end
 
   def self.generate_samples(quantity = 1000)

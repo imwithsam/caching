@@ -7,6 +7,7 @@ gem 'sass-rails'
 gem 'coffee-rails'
 gem 'uglifier'
 gem 'dalli'
+gem 'redis-rails'
 
 group :development, :test do
   gem 'spring'

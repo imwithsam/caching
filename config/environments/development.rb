@@ -12,8 +12,9 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local       = true
 
-  # Enable Memcached caching
-  config.cache_store = :dalli_store
+  # Enable Redis caching
+  # config.cache_store = :dalli_store
+  config.cache_store = :redis_store, "redis://localhost:6379/1/ns"
   config.action_controller.perform_caching = true
 
   # Don't care if the mailer can't send.
